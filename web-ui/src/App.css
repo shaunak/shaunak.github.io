@@ -1,0 +1,90 @@
+
+.icon {
+  height: 2rem;
+  pointer-events: none;
+  padding: 0.5rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.buttonContainer {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: start;
+  white-space: nowrap; /* Keeps the content on a single line */
+}
+
+.iconButton {
+  background-color: transparent;
+  border: none;
+  transition: 0.2s;
+  border-radius: 1rem;
+  padding: 0;
+}
+
+.iconButton:hover {
+  background-color: #b5e5f6;
+  border-radius: 1.1rem;
+  opacity: 1
+}
+
+
+.MainContent {
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Space Mono', monospace;
+  background-color: white;
+  display: grid;
+  grid-template-rows: 1fr 0.3fr 2fr;
+  grid-template-columns: 1fr 2fr 2fr;
+  justify-content: center;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: rgb(0, 0, 0);
+  animation: backgroundTransition 2s ease forwards;
+}
+
+@keyframes backgroundTransition {
+  to {
+      background-color: #F3FFE3;
+  }
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+a:hover {
+  border-color: #000 !important;
+}
+
+
+
+.throughLine {
+  font-family: 'Space Mono', monospace;
+  font-size: medium;
+  max-width: 100%;
+  align-self: start;
+  justify-self: start;
+  line-height: 2rem;
+  grid-row: 3;
+  grid-column: 2;
+}
+
+.typewriter {
+  grid-column: 2;
+  justify-self: start;
+  text-align: start;
+  overflow: hidden; /* Ensures the content is not revealed until the animation */
+  white-space: nowrap; /* Keeps the content on a single line */
+  animation: 
+    typing 2s steps(40, end),
+    blink-caret .75s step-end infinite;
+}
+
+/* The typing effect */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
