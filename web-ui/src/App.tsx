@@ -1,15 +1,18 @@
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import logo from "./logo.svg";
 import constructioSymbol from "./construction-svgrepo-com.svg";
 import linkedinSymbol from "./linkedin.svg";
 import githubSymbol from "./github.svg";
 import emailSymbol from "./email.svg";
 import resumeIcon from "./resume.svg";
+// @ts-ignore
 import resume from './pdfs/ShaunakT_Resume.pdf'
+import DenLoop from "./DenLoop";
 import "./App.css";
 
-function App() {
-  const openLink = (url) => {
+function Home() {
+  const openLink = (url: any) => {
     window.open(url, "_blank");
   };
 
@@ -25,26 +28,26 @@ function App() {
               window.open("mailto:shaun.tul@gmail.com", "_blank");
             }}
             >
-            <img src={emailSymbol} className="icon" alt="email" />
+            <img src={emailSymbol as any} className="icon" alt="email" />
             </button>
           <button
             className="iconButton"
             onClick={() => openLink("https://www.linkedin.com/in/shaunakt/")}
           >
-            <img src={linkedinSymbol} className="icon" alt="linkedin" />
+            <img src={linkedinSymbol as any} className="icon" alt="linkedin" />
           </button>
           <button
             className="iconButton"
             onClick={() => openLink("https://www.github.com/shaunak")}
           >
-            <img src={githubSymbol} className="icon" alt="github" />
+            <img src={githubSymbol as any} className="icon" alt="github" />
           </button>
           <button
             className="iconButton"
             onClick={() => window.open(resume, '_blank')}
             // onClick={() => window.open(window.location.href +  'pdf/ShaunakT_Resume.pdf', '_blank')}
           >
-            <img src={resumeIcon} className="icon" alt="resume" />
+            <img src={resumeIcon as any} className="icon" alt="resume" />
           </button>
         </div>
         <div className="throughLine">
@@ -53,6 +56,17 @@ function App() {
         </div>
       </main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/denLoop" element={<DenLoop />} />
+      </Routes>
+    </Router>
   );
 }
 
