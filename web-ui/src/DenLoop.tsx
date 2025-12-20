@@ -102,7 +102,7 @@ function DenLoop() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/denLoop`,
+          emailRedirectTo: `${window.location.origin}/#/denLoop`,
         },
       });
 

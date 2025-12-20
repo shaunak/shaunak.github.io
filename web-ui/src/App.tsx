@@ -1,7 +1,4 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import logo from "./logo.svg";
-import constructioSymbol from "./construction-svgrepo-com.svg";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import linkedinSymbol from "./linkedin.svg";
 import githubSymbol from "./github.svg";
 import emailSymbol from "./email.svg";
@@ -10,6 +7,9 @@ import resumeIcon from "./resume.svg";
 import resume from './pdfs/ShaunakT_Resume.pdf'
 import DenLoop from "./DenLoop";
 import "./App.css";
+import Blog from "./Blog";
+import LifeUpdatePage from "./LifeUpdatePage";
+import BlogPostPage from "./BlogPostPage";
 
 function Home() {
   const openLink = (url: any) => {
@@ -61,12 +61,19 @@ function Home() {
 
 function App() {
   return (
-    <Router>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/denLoop" element={<DenLoop />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPostPage />} />
+        <Route path="/blog/lifeupdate/:id" element={<LifeUpdatePage />} />
+        <Route
+          path="/blog/lifeUpdate0"
+          element={<Navigate to="/blog/lifeupdate/0" replace />}
+        />
       </Routes>
-    </Router>
+    </HashRouter>
   );
 }
 
