@@ -200,8 +200,8 @@ function BlogPostPage() {
 
   return (
     <div className="App">
-      <main className="MainContent">
-        <h1 className="typewriter">{post?.title ?? ""}</h1>
+      <main className="MainContent BlogPostMainContent">
+        {post?.title ? <h1 className="typewriter">{post?.title}</h1> : null}
 
 
         <div className="throughLine">

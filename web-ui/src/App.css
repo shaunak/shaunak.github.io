@@ -45,6 +45,17 @@
   animation: backgroundTransition 2s ease forwards;
 }
 
+/* Blog post pages: widen the center column without changing the rest of the site */
+.BlogPostMainContent {
+  grid-template-columns: 1fr 3.5fr 1fr;
+}
+
+@media (max-width: 900px) {
+  .BlogPostMainContent {
+    grid-template-columns: 0.5fr 0.1fr 0.5fr;
+  }
+}
+
 @keyframes backgroundTransition {
   to {
       background-color: #F3FFE3;
