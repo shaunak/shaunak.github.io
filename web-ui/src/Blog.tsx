@@ -115,7 +115,7 @@ const Blog = () => {
   return (
     <div className="App">
       <main className="MainContent">
-        <h1 className="typewriter">Blog</h1>
+        <h1 className="BlogTypewriter">Blog</h1>
 
         <div className="buttonContainer" style={{ gridRow: 2 }}>
           <Link to="/" className="iconButton" style={{ padding: "0.25rem 0.5rem" }}>

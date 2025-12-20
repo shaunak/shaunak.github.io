@@ -201,12 +201,12 @@ function BlogPostPage() {
   return (
     <div className="App">
       <main className="MainContent BlogPostMainContent">
-        {post?.title ? <h1 className="typewriter">{post?.title}</h1> : null}
+        {post?.title ? <h1 className="BlogTypewriter">{post?.title}</h1> : null}
 
 
         <div className="throughLine">
           {showContentOnly ? (
-            <div style={{ lineHeight: "1.85rem" }}>
+            <div className="blogMarkdown" style={{ lineHeight: "1.85rem" }}>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{

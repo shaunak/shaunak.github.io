@@ -45,15 +45,55 @@
   animation: backgroundTransition 2s ease forwards;
 }
 
-/* Blog post pages: widen the center column without changing the rest of the site */
+/* Blog post pages: opt out of the global grid layout.
+   Keep the same typography/background, but use centered content with padding. */
 .BlogPostMainContent {
-  grid-template-columns: 1fr 3.5fr 1fr;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: clamp(2rem, 4vw, 4rem) clamp(1rem, 3vw, 2.5rem);
+  gap: 1.25rem;
 }
 
-@media (max-width: 900px) {
-  .BlogPostMainContent {
-    grid-template-columns: 0.5fr 0.1fr 0.5fr;
-  }
+/* Constrain readable line length, while keeping everything centered */
+.BlogPostMainContent .typewriter,
+.BlogPostMainContent .throughLine {
+  width: min(980px, 100%);
+}
+
+/* Center the blog post text content */
+.BlogPostMainContent .throughLine {
+  text-align: left;
+}
+
+/* Keep code blocks readable */
+.BlogPostMainContent pre,
+.BlogPostMainContent code {
+  text-align: left;
+}
+
+/* ReactMarkdown emits block elements like p/li which can pick up other styles.
+   Force centering for normal prose, but keep code blocks left-aligned. */
+.BlogPostMainContent .blogMarkdown,
+.BlogPostMainContent .blogMarkdown p,
+.BlogPostMainContent .blogMarkdown li,
+.BlogPostMainContent .blogMarkdown blockquote,
+.BlogPostMainContent .blogMarkdown h2,
+.BlogPostMainContent .blogMarkdown h3,
+.BlogPostMainContent .blogMarkdown h4 {
+  text-align: left;
+}
+
+.BlogPostMainContent .blogMarkdown pre,
+.BlogPostMainContent .blogMarkdown code {
+  text-align: left;
+}
+
+/* Center the code block container itself */
+.BlogPostMainContent .blogMarkdown pre {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 @keyframes backgroundTransition {
@@ -76,7 +116,7 @@ a:hover {
   font-family: 'Space Mono', monospace;
   font-size: medium;
   max-width: 100%;
-  align-self: start;
+  align-self: center;
   justify-self: start;
   line-height: 2rem;
   grid-row: 3;
@@ -92,6 +132,27 @@ a:hover {
   animation: 
     typing 2s steps(40, end),
     blink-caret .75s step-end infinite;
+}
+
+/* Blog-only title animation: reveal from the center outward (instead of left->right). */
+.BlogTypewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  -webkit-clip-path: inset(0 50% 0 50%);
+  clip-path: inset(0 50% 0 50%);
+  animation: blogTyping 900ms ease-out forwards;
+}
+
+@keyframes blogTyping {
+  from {
+    -webkit-clip-path: inset(0 50% 0 50%);
+    clip-path: inset(0 50% 0 50%);
+  }
+  to {
+    -webkit-clip-path: inset(0 0 0 0);
+    clip-path: inset(0 0 0 0);
+  }
 }
 
 /* The typing effect */
