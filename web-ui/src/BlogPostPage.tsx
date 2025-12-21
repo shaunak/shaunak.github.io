@@ -4,6 +4,7 @@ import type { Session } from "@supabase/supabase-js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { blogSupabase } from "./blogSupabaseClient";
+import outputGif from "./images/output.gif";
 import "./App.css";
 
 type PostRow = {
@@ -31,6 +32,7 @@ function BlogPostPage() {
 
   const isAuthed = useMemo(() => !!session?.user, [session]);
   const showContentOnly = !loading && !error && !!post;
+  const shouldEmbedOutputGif = isAuthed && slug === "0";
 
   useEffect(() => {
     let mounted = true;
@@ -252,6 +254,20 @@ function BlogPostPage() {
               >
                 {post?.content ?? ""}
               </ReactMarkdown>
+              {shouldEmbedOutputGif ? (
+                <img
+                  src={outputGif}
+                  alt="Output"
+                  style={{
+                    width: "100%",
+                    maxWidth: "900px",
+                    borderRadius: "0.75rem",
+                    display: "block",
+                    margin: "0.5rem auto 1rem",
+                    boxShadow: "0 8px 28px rgba(0,0,0,0.12)",
+                  }}
+                />
+              ) : null}
             </div>
           ) : (
             <>

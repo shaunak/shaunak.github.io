@@ -144,6 +144,22 @@ a:hover {
   animation: blogTyping 900ms ease-out forwards;
 }
 
+/* Mobile: allow long titles to wrap instead of clipping off-screen. */
+@media (max-width: 600px) {
+  .BlogTypewriter {
+    overflow: visible;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    -webkit-clip-path: none;
+    clip-path: none;
+    animation: none;
+    font-size: clamp(1.6rem, 8vw, 2.4rem);
+    line-height: 1.15;
+    padding: 0 0.25rem;
+  }
+}
+
 @keyframes blogTyping {
   from {
     -webkit-clip-path: inset(0 50% 0 50%);
