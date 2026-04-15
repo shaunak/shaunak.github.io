@@ -5,6 +5,7 @@ import resume from './pdfs/ShaunakT_Resume.pdf'
 import DenLoop from "./DenLoop";
 import "./App.css";
 import Blog from "./Blog";
+import BlogSignInPage from "./BlogSignInPage";
 import LifeUpdatePage from "./LifeUpdatePage";
 import BlogPostPage from "./BlogPostPage";
 
@@ -16,7 +17,7 @@ function Home() {
       text: "I'm a software developer based in NYC. I like solving meaningful problems for people. \n\n Currently, I'm a founding engineer at  ",
     },
     { text: "Centralize", href: "https://www.usecentralize.com" },
-    { text: ". We're building the relationship selling platform for mid market and enterprise GTM teams. We power GTM for some very large companies like CoreWeave, Brex, Cresta, and many more. \n\n Previously, I was an engineer at " },
+    { text: ". We're building the relationship selling platform for mid market and enterprise GTM teams. We power GTM for some very large companies like CoreWeave, Brex, Cresta, and more. \n\n Previously, I was an engineer at " },
     { text: "Gusto", href: "https://gusto.com" },
     { text: " where I launched the AI Platform team. \n\n Before that, I was getting my BSc in CS from UBC. Super beautiful place." },
   ];
@@ -35,6 +36,11 @@ function Home() {
       key: "github",
       label: "github",
       href: "https://www.github.com/shaunak",
+    },
+    {
+      key: "blog",
+      label: "blog",
+      href: "#/blog",
     },
     {
       key: "resume",
@@ -185,8 +191,16 @@ function Home() {
             key={link.key}
             className="link socialLink streamInIcon"
             href={link.href}
-            target={link.href.startsWith("mailto:") ? undefined : "_blank"}
-            rel={link.href.startsWith("mailto:") ? undefined : "noreferrer"}
+            target={
+              link.href.startsWith("mailto:") || link.href.startsWith("#")
+                ? undefined
+                : "_blank"
+            }
+            rel={
+              link.href.startsWith("mailto:") || link.href.startsWith("#")
+                ? undefined
+                : "noreferrer"
+            }
             >
             {link.label}
             </a>
@@ -205,6 +219,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/denLoop" element={<DenLoop />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/signin" element={<BlogSignInPage />} />
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/blog/lifeupdate/:id" element={<LifeUpdatePage />} />
         <Route

@@ -1,14 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { blogSupabase } from "./blogSupabaseClient";
-import outputGif from "./images/output.gif";
 import "./App.css";
 
 type PostRow = {
   title: string | null;
+  subheading: string | null;
+  tags: string | null;
+  created_at: string | null;
   slug: string | null;
   content: string | null;
   is_protected: boolean | null;
@@ -32,7 +34,30 @@ function BlogPostPage() {
 
   const isAuthed = useMemo(() => !!session?.user, [session]);
   const showContentOnly = !loading && !error && !!post;
-  const shouldEmbedOutputGif = isAuthed && slug === "0";
+
+  const getOrdinalSuffix = (day: number): string => {
+    if (day >= 11 && day <= 13) return "th";
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
+
+  const formatHumanDate = (createdAt: string | null): string => {
+    if (!createdAt) return "";
+    const date = new Date(createdAt);
+    if (Number.isNaN(date.getTime())) return "";
+    const month = date.toLocaleDateString("en-US", { month: "long" });
+    const day = date.getDate();
+    const year = date.getFullYear();
+    return `${month} ${day}${getOrdinalSuffix(day)}, ${year}`;
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -68,7 +93,7 @@ function BlogPostPage() {
       try {
         const { data, error: fetchError } = await blogSupabase
           .from("posts")
-          .select("title,slug,content,is_protected")
+          .select("title,subheading,tags,created_at,slug,content,is_protected")
           .eq("slug", slug)
           .maybeSingle();
 
@@ -204,9 +229,28 @@ function BlogPostPage() {
     <div className="App">
       <main className="MainContent BlogPostMainContent">
         {post?.title ? <h1 className="BlogTypewriter">{post?.title}</h1> : null}
+        {post?.subheading ? (
+          <div className="blogPostPageSubheading">{post.subheading}</div>
+        ) : null}
+        {post?.tags ? (
+          <div className="blogPostTags">
+            {post.tags
+              .split(";")
+              .map((tag) => tag.trim())
+              .filter(Boolean)
+              .map((tag) => (
+                <span key={`post-page-${tag}`} className="blogPostTag">
+                  {tag}
+                </span>
+              ))}
+          </div>
+        ) : null}
 
 
         <div className="throughLine">
+          {post?.created_at ? (
+            <div className="blogPostPageDate">{formatHumanDate(post.created_at)}</div>
+          ) : null}
           {showContentOnly ? (
             <div className="blogMarkdown" style={{ lineHeight: "1.85rem" }}>
               <ReactMarkdown
@@ -216,6 +260,9 @@ function BlogPostPage() {
                     <a {...props} target="_blank" rel="noreferrer">
                       {children}
                     </a>
+                  ),
+                  img: ({ alt, ...props }) => (
+                    <img {...props} alt={alt ?? ""} className="blogMarkdownImage" />
                   ),
                   code: ({ children, className, ...props }) => {
                     const match = /language-(\w+)/.exec(className || "");
@@ -254,20 +301,6 @@ function BlogPostPage() {
               >
                 {post?.content ?? ""}
               </ReactMarkdown>
-              {shouldEmbedOutputGif ? (
-                <img
-                  src={outputGif}
-                  alt="Output"
-                  style={{
-                    width: "100%",
-                    maxWidth: "900px",
-                    borderRadius: "0.75rem",
-                    display: "block",
-                    margin: "0.5rem auto 1rem",
-                    boxShadow: "0 8px 28px rgba(0,0,0,0.12)",
-                  }}
-                />
-              ) : null}
             </div>
           ) : (
             <>

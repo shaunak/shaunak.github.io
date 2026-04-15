@@ -116,6 +116,15 @@
   text-align: left;
 }
 
+.BlogPostMainContent .blogMarkdown .blogMarkdownImage {
+  display: block;
+  width: 80%;
+  max-width: 80%;
+  height: auto;
+  margin: 0.75rem auto 1rem;
+  border-radius: 0.55rem;
+}
+
 /* Center the code block container itself */
 .BlogPostMainContent .blogMarkdown pre {
   margin-left: auto;
@@ -154,6 +163,10 @@ a:hover {
   grid-column: 2;
 }
 
+.blogThroughLine {
+  width: min(980px, 100%);
+}
+
 .homeThroughLine {
   white-space: pre-line;
 }
@@ -166,11 +179,223 @@ a:hover {
   white-space: pre-line;
 }
 
+.blogSectionTitle {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.blogSectionHeaderRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(4rem, 10vw, 6rem);
+  column-gap: clamp(0.95rem, 2vw, 1.45rem);
+  align-items: center;
+}
+
+.blogHeaderActionCell {
+  width: 100%;
+  min-width: clamp(4rem, 10vw, 6rem);
+  max-width: clamp(4rem, 10vw, 6rem);
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: clamp(0.15rem, 0.6vw, 0.45rem);
+}
+
+.blogAuthContainer {
+  margin-bottom: 1rem;
+}
+
+.blogStatusText {
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.blogLockedCountText {
+  margin-top: -0.2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.72;
+  font-size: 0.72em;
+}
+
+.blogAuthForm {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.blogPasswordInput {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  min-width: 16rem;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.blogActionButton {
+  padding: 0.25rem 0.5rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.14em;
+  font-family: inherit;
+  font-size: 0.75em;
+}
+
+.blogActionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.blogErrorText {
+  margin-top: 0.5rem;
+  color: #b00020;
+}
+
+.blogPostsList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.blogPostsListItem {
+  margin-bottom: 0.45rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.blogPostsListItem:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.blogPostTitleRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(4rem, 10vw, 6rem);
+  column-gap: clamp(0.95rem, 2vw, 1.45rem);
+  align-items: start;
+  min-width: 0;
+}
+
+.blogPostDate {
+  font-size: 0.6em;
+  opacity: 0.62;
+  margin-bottom: 0.15rem;
+}
+
+.blogPostSubheading {
+  display: block;
+  margin: 0.12rem 0 0 0;
+  font-size: 0.78em;
+  opacity: 0.82;
+}
+
+.blogPostTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.15rem 0 0.45rem 0.5rem;
+}
+
+.blogPostTag {
+  font-size: 0.65em;
+  border: 1px solid rgba(0, 0, 0, 0.22);
+  border-radius: 999px;
+  padding: 0.08rem 0.45rem;
+  line-height: 1.2;
+}
+
+.blogPostPageSubheading {
+  width: min(980px, 100%);
+  color: rgba(0, 0, 0, 0.62);
+  font-size: 0.55em;
+  text-align: center;
+  margin-top: -0.65rem;
+  margin-bottom: 0.05rem;
+}
+
+.blogPostPageDate {
+  font-size: 1em;
+  color: rgba(0, 0, 0, 0.62);
+  margin-bottom: 0.35rem;
+}
+
+.blogPostLink {
+  display: inline-block;
+  padding: 0.2rem 0 0 0;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  text-decoration: none;
+  color: inherit;
+}
+
+.blogPostTextLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.blogPostActionCell {
+  width: 100%;
+  min-width: clamp(4rem, 10vw, 6rem);
+  max-width: clamp(4rem, 10vw, 6rem);
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-right: clamp(0.15rem, 0.6vw, 0.45rem);
+  padding-top: 0.35rem;
+}
+
+.blogLockButton {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  width: auto;
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem;
+  border-radius: 0;
+}
+
+.blogLockButton:hover {
+  opacity: 0.7;
+}
+
+.blogLockButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.blogPostAmpersand {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.92;
+}
+
+.blogPostLockIndicator {
+  display: inline-flex;
+  align-items: center;
+  opacity: 1;
+}
+
+.blogPostTextLink:hover {
+  opacity: 0.7;
+}
+
 /* Blog-only title animation: reveal from the center outward (instead of left->right). */
 .BlogTypewriter {
   overflow: hidden;
   white-space: nowrap;
   text-align: center;
+  margin-bottom: 0.2rem;
   -webkit-clip-path: inset(0 50% 0 50%);
   clip-path: inset(0 50% 0 50%);
   animation: blogTyping 900ms ease-out forwards;
