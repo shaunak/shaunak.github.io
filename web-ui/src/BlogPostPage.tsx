@@ -4,6 +4,7 @@ import type { Session } from "@supabase/supabase-js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { blogSupabase } from "./blogSupabaseClient";
+import PhotoStack, { parsePhotoStackBlock } from "./PhotoStack";
 import "./App.css";
 
 type PostRow = {
@@ -264,8 +265,24 @@ function BlogPostPage() {
                   img: ({ alt, ...props }) => (
                     <img {...props} alt={alt ?? ""} className="blogMarkdownImage" />
                   ),
+                  pre: ({ children, ...props }) => {
+                    const onlyChild: any = Array.isArray(children)
+                      ? children[0]
+                      : children;
+                    const childClassName: string =
+                      onlyChild?.props?.className ?? "";
+                    if (childClassName.includes("language-photostack")) {
+                      return <>{children}</>;
+                    }
+                    return <pre {...props}>{children}</pre>;
+                  },
                   code: ({ children, className, ...props }) => {
                     const match = /language-(\w+)/.exec(className || "");
+                    if (match?.[1] === "photostack") {
+                      return (
+                        <PhotoStack images={parsePhotoStackBlock(String(children))} />
+                      );
+                    }
                     const isBlock = !!match;
                     if (!isBlock) {
                       return (
