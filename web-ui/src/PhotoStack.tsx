@@ -110,9 +110,13 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
     })();
     const maxWidth = container - frame;
     const landscape = natWidth >= natHeight;
+    // Portrait photos scale up with the column too: their height matches what
+    // a 4:3 landscape renders at full column width, so the stack keeps a
+    // consistent presence. Never below the small-screen cap.
+    const portraitMaxHeight = Math.max(MAX_PORTRAIT_HEIGHT_PX, maxWidth * 0.75);
     const scale = landscape
       ? Math.min(maxWidth / natWidth, 1)
-      : Math.min(MAX_PORTRAIT_HEIGHT_PX / natHeight, maxWidth / natWidth, 1);
+      : Math.min(portraitMaxHeight / natHeight, maxWidth / natWidth, 1);
     return { width: natWidth * scale, height: natHeight * scale };
   };
 

@@ -22,6 +22,12 @@ html, body {
   overflow-x: clip;
 }
 
+/* PhotoStack shuffles animate the pile's height; without this, scroll
+   anchoring "compensates" mid-animation and the page visibly jumps. */
+html {
+  overflow-anchor: none;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
