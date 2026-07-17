@@ -604,6 +604,18 @@ a:hover {
   }
 }
 
+/* Front-slot size reconciliation: the photo taking (or holding) the front
+   slot animates between the two shapes so the pile never snaps. */
+.photoStackTopReveal .photoStackImage {
+  object-fit: cover;
+  animation: photoStackGrowDims 440ms cubic-bezier(0.25, 0.6, 0.3, 1) forwards;
+}
+
+.photoStackTopPresqueeze .photoStackImage {
+  object-fit: cover;
+  animation: photoStackGrowDims 300ms ease-in-out 280ms forwards;
+}
+
 /* B. Fade away: the card dissolves as it slips under the pile (and fades in
    while emerging from it). */
 .photoStackVariant-fade.photoStackFlyNext .photoStackFlyCard {

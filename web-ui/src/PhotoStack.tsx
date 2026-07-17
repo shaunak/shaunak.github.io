@@ -29,7 +29,7 @@ export function getShuffleVariant(): ShuffleVariant {
   const stored = window.localStorage?.getItem(VARIANT_STORAGE_KEY);
   return SHUFFLE_VARIANTS.some((v) => v.id === stored)
     ? (stored as ShuffleVariant)
-    : "shrink";
+    : "fade";
 }
 
 export function setShuffleVariant(variant: ShuffleVariant) {
@@ -44,6 +44,18 @@ type FlyingCard = {
   fromHeight?: number;
   toWidth?: number;
   toHeight?: number;
+};
+
+// Size animation for the front-slot photo during a shuffle, so the pile never
+// snaps between differently-shaped photos. "reveal": the incoming front photo
+// grows from the outgoing card's box into its own (next). "presqueeze": the
+// outgoing front photo shrinks to the arriving card's box while covered (prev).
+type TopAnim = {
+  mode: "reveal" | "presqueeze";
+  fromWidth: number;
+  fromHeight: number;
+  toWidth: number;
+  toHeight: number;
 };
 
 // Matches the animation-duration of photoStackFlyNext/Prev in App.css.
@@ -66,6 +78,7 @@ export function parsePhotoStackBlock(block: string): PhotoStackImage[] {
 const PhotoStack = ({ images }: PhotoStackProps) => {
   const [index, setIndex] = useState(0);
   const [flying, setFlying] = useState<FlyingCard | null>(null);
+  const [topAnim, setTopAnim] = useState<TopAnim | null>(null);
   const [variant, setVariant] = useState<ShuffleVariant>(getShuffleVariant);
   const topImageRef = useRef<HTMLImageElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -87,6 +100,7 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
         setIndex((i) => (i - 1 + count) % count);
       }
       setFlying(null);
+      setTopAnim(null);
       inFlightRef.current = false;
     }, SHUFFLE_MS);
     return () => window.clearTimeout(timer);
@@ -121,6 +135,11 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
       : null;
   };
 
+  const sizesDiffer = (
+    a: { width: number; height: number },
+    b: { width: number; height: number }
+  ) => Math.abs(a.width - b.width) > 2 || Math.abs(a.height - b.height) > 2;
+
   const showNext = () => {
     if (inFlightRef.current || count < 2) return;
     inFlightRef.current = true;
@@ -136,6 +155,19 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
       toWidth: to?.width,
       toHeight: to?.height,
     });
+    // The incoming front photo grows out of the outgoing card's box instead
+    // of popping in at full size.
+    setTopAnim(
+      from && to && sizesDiffer(from, to)
+        ? {
+            mode: "reveal",
+            fromWidth: from.width,
+            fromHeight: from.height,
+            toWidth: to.width,
+            toHeight: to.height,
+          }
+        : null
+    );
     setIndex((i) => (i + 1) % count);
   };
 
@@ -154,6 +186,19 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
       toWidth: to?.width,
       toHeight: to?.height,
     });
+    // Squeeze the pile toward the arriving card's box while it's covered so
+    // nothing snaps when the card lands and the index commits.
+    setTopAnim(
+      from && to && sizesDiffer(from, to)
+        ? {
+            mode: "presqueeze",
+            fromWidth: from.width,
+            fromHeight: from.height,
+            toWidth: to.width,
+            toHeight: to.height,
+          }
+        : null
+    );
     // index is committed when the card lands, in the effect above.
   };
 
@@ -193,7 +238,25 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
       >
         <div className="photoStackCard photoStackCardBehindTwo" aria-hidden="true" />
         <div className="photoStackCard photoStackCardBehindOne" aria-hidden="true" />
-        <figure className="photoStackCard photoStackCardTop">
+        <figure
+          className={`photoStackCard photoStackCardTop${
+            topAnim
+              ? topAnim.mode === "reveal"
+                ? " photoStackTopReveal"
+                : " photoStackTopPresqueeze"
+              : ""
+          }`}
+          style={
+            topAnim
+              ? ({
+                  "--flyFromW": `${topAnim.fromWidth}px`,
+                  "--flyFromH": `${topAnim.fromHeight}px`,
+                  "--flyToW": `${topAnim.toWidth}px`,
+                  "--flyToH": `${topAnim.toHeight}px`,
+                } as React.CSSProperties)
+              : undefined
+          }
+        >
           <img
             ref={topImageRef}
             src={current.src}
