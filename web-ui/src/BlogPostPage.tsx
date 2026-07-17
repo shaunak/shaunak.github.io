@@ -4,7 +4,10 @@ import type { Session } from "@supabase/supabase-js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { blogSupabase } from "./blogSupabaseClient";
-import PhotoStack, { parsePhotoStackBlock } from "./PhotoStack";
+import PhotoStack, {
+  parsePhotoStackBlock,
+  PhotoStackLabSwitcher,
+} from "./PhotoStack";
 import "./App.css";
 
 type PostRow = {
@@ -228,6 +231,7 @@ function BlogPostPage() {
 
   return (
     <div className="App">
+      <PhotoStackLabSwitcher />
       <main className="MainContent BlogPostMainContent">
         {post?.title ? <h1 className="BlogTypewriter">{post?.title}</h1> : null}
         {post?.subheading ? (
