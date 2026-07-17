@@ -11,32 +11,6 @@ type PhotoStackProps = {
   images: PhotoStackImage[];
 };
 
-// How the in-flight card reconciles its size with the photo taking the front
-// slot. Prototype switcher below; pick one and delete the rest before deploy.
-export type ShuffleVariant = "shrink" | "fade" | "recede" | "flip";
-
-export const SHUFFLE_VARIANTS: { id: ShuffleVariant; label: string }[] = [
-  { id: "shrink", label: "Shrink to fit" },
-  { id: "fade", label: "Fade away" },
-  { id: "recede", label: "Scale recede" },
-  { id: "flip", label: "3D tuck" },
-];
-
-const VARIANT_STORAGE_KEY = "photoStackVariant";
-const VARIANT_EVENT = "photostack-variant-change";
-
-export function getShuffleVariant(): ShuffleVariant {
-  const stored = window.localStorage?.getItem(VARIANT_STORAGE_KEY);
-  return SHUFFLE_VARIANTS.some((v) => v.id === stored)
-    ? (stored as ShuffleVariant)
-    : "fade";
-}
-
-export function setShuffleVariant(variant: ShuffleVariant) {
-  window.localStorage?.setItem(VARIANT_STORAGE_KEY, variant);
-  window.dispatchEvent(new Event(VARIANT_EVENT));
-}
-
 type FlyingCard = {
   dir: "next" | "prev";
   src: string;
@@ -60,7 +34,7 @@ type TopAnim = {
 
 // Matches the animation-duration of photoStackFlyNext/Prev in App.css.
 const SHUFFLE_MS = 620;
-const MAX_PHOTO_HEIGHT_PX = 384;
+const MAX_PORTRAIT_HEIGHT_PX = 384;
 
 export function parsePhotoStackBlock(block: string): PhotoStackImage[] {
   return block
@@ -79,7 +53,9 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
   const [index, setIndex] = useState(0);
   const [flying, setFlying] = useState<FlyingCard | null>(null);
   const [topAnim, setTopAnim] = useState<TopAnim | null>(null);
-  const [variant, setVariant] = useState<ShuffleVariant>(getShuffleVariant);
+  // Bumped when a photo loads, the container mounts, or the window resizes —
+  // anything that can change the computed slot sizes below.
+  const [, setLayoutTick] = useState(0);
   const topImageRef = useRef<HTMLImageElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   // State updates lag same-tick clicks, so the in-flight guard lives in a ref.
@@ -88,9 +64,10 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
   const count = images.length;
 
   useEffect(() => {
-    const sync = () => setVariant(getShuffleVariant());
-    window.addEventListener(VARIANT_EVENT, sync);
-    return () => window.removeEventListener(VARIANT_EVENT, sync);
+    const bump = () => setLayoutTick((t) => t + 1);
+    bump(); // container ref is attached now; recompute slot sizes
+    window.addEventListener("resize", bump);
+    return () => window.removeEventListener("resize", bump);
   }, []);
 
   useEffect(() => {
@@ -114,19 +91,32 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
       ? [images[(index + 1) % count].src, images[(index - 1 + count) % count].src]
       : [];
 
-  // Fix the flying card to a known pixel size so it doesn't reflow when the
-  // photo underneath it (which sizes the pile) has a different aspect ratio.
+  // The size a photo renders at in the front slot: landscape photos span the
+  // full text-column width (card frame included); portrait photos are capped
+  // in height instead.
   const fitToSlot = (natWidth: number, natHeight: number) => {
-    const maxWidth = containerRef.current?.clientWidth ?? Infinity;
-    const scale = Math.min(
-      MAX_PHOTO_HEIGHT_PX / natHeight,
-      maxWidth / natWidth,
-      1
-    );
+    const container = containerRef.current?.clientWidth;
+    if (!container) return null;
+    const frame = (() => {
+      const card = containerRef.current?.querySelector(".photoStackCardTop");
+      if (!card) return 0;
+      const cs = getComputedStyle(card);
+      return (
+        parseFloat(cs.paddingLeft) +
+        parseFloat(cs.paddingRight) +
+        parseFloat(cs.borderLeftWidth) +
+        parseFloat(cs.borderRightWidth)
+      );
+    })();
+    const maxWidth = container - frame;
+    const landscape = natWidth >= natHeight;
+    const scale = landscape
+      ? Math.min(maxWidth / natWidth, 1)
+      : Math.min(MAX_PORTRAIT_HEIGHT_PX / natHeight, maxWidth / natWidth, 1);
     return { width: natWidth * scale, height: natHeight * scale };
   };
 
-  // Slot size a photo will render at, if the browser has it cached.
+  // Slot size for a photo, if the browser has it cached.
   const probeSlotSize = (src: string) => {
     const probe = new Image();
     probe.src = src;
@@ -202,34 +192,38 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
     // index is committed when the card lands, in the effect above.
   };
 
-  const flyStyle = (card: FlyingCard): React.CSSProperties | undefined => {
-    if (!card.fromWidth || !card.fromHeight || !card.toWidth || !card.toHeight) {
-      return undefined;
-    }
-    // "recede" shrinks the whole card to the width of the card it hides
-    // behind (next) or grows out from it (prev).
-    const smaller = Math.min(
-      card.toWidth / card.fromWidth,
-      card.toHeight / card.fromHeight
-    );
+  const sizeVars = (anim: TopAnim | FlyingCard): React.CSSProperties | undefined => {
+    const { fromWidth, fromHeight, toWidth, toHeight } = anim as TopAnim;
+    if (!fromWidth || !fromHeight || !toWidth || !toHeight) return undefined;
     return {
-      "--flyFromW": `${card.fromWidth}px`,
-      "--flyFromH": `${card.fromHeight}px`,
-      "--flyToW": `${card.toWidth}px`,
-      "--flyToH": `${card.toHeight}px`,
-      "--tuckScale": Math.min(smaller, 1),
+      "--flyFromW": `${fromWidth}px`,
+      "--flyFromH": `${fromHeight}px`,
+      "--flyToW": `${toWidth}px`,
+      "--flyToH": `${toHeight}px`,
     } as React.CSSProperties;
   };
 
-  const flyImageStyle = (card: FlyingCard): React.CSSProperties | undefined => {
-    // The static size of the in-flight photo: the size it left the front at
-    // (next), or the size it will land on the front at (prev). Variant
-    // animations in App.css interpolate between the CSS vars above.
-    const width = card.dir === "next" ? card.fromWidth : card.toWidth;
-    const height = card.dir === "next" ? card.fromHeight : card.toHeight;
-    if (!width || !height) return undefined;
-    return { width, height, maxWidth: "none" };
-  };
+  const exactSize = (
+    size: { width: number; height: number } | null
+  ): React.CSSProperties | undefined =>
+    size
+      ? {
+          width: size.width,
+          height: size.height,
+          maxWidth: "none",
+          maxHeight: "none",
+        }
+      : undefined;
+
+  const topSlot = probeSlotSize(current.src);
+  const flyingSize =
+    flying && flying.fromWidth && flying.fromHeight
+      ? flying.dir === "next"
+        ? { width: flying.fromWidth, height: flying.fromHeight }
+        : flying.toWidth && flying.toHeight
+        ? { width: flying.toWidth, height: flying.toHeight }
+        : null
+      : null;
 
   return (
     <div className="photoStack" ref={containerRef}>
@@ -246,30 +240,23 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
                 : " photoStackTopPresqueeze"
               : ""
           }`}
-          style={
-            topAnim
-              ? ({
-                  "--flyFromW": `${topAnim.fromWidth}px`,
-                  "--flyFromH": `${topAnim.fromHeight}px`,
-                  "--flyToW": `${topAnim.toWidth}px`,
-                  "--flyToH": `${topAnim.toHeight}px`,
-                } as React.CSSProperties)
-              : undefined
-          }
+          style={topAnim ? sizeVars(topAnim) : undefined}
         >
           <img
             ref={topImageRef}
             src={current.src}
             alt={current.caption ?? ""}
             className="photoStackImage"
+            style={exactSize(topSlot)}
+            onLoad={() => setLayoutTick((t) => t + 1)}
           />
         </figure>
         {flying ? (
           <div
             className={`photoStackFly ${
               flying.dir === "next" ? "photoStackFlyNext" : "photoStackFlyPrev"
-            } photoStackVariant-${variant}`}
-            style={flyStyle(flying)}
+            }`}
+            style={sizeVars(flying)}
             aria-hidden="true"
           >
             <figure className="photoStackCard photoStackFlyCard">
@@ -277,7 +264,7 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
                 src={flying.src}
                 alt=""
                 className="photoStackImage"
-                style={flyImageStyle(flying)}
+                style={exactSize(flyingSize)}
               />
             </figure>
           </div>
@@ -317,35 +304,6 @@ const PhotoStack = ({ images }: PhotoStackProps) => {
           <img key={src} src={src} alt="" />
         ))}
       </div>
-    </div>
-  );
-};
-
-// Prototype-only floating panel for comparing shuffle variants live.
-// Remove (along with the variant plumbing above) once a winner is chosen.
-export const PhotoStackLabSwitcher = () => {
-  const [variant, setVariantState] = useState<ShuffleVariant>(getShuffleVariant);
-
-  const choose = (v: ShuffleVariant) => {
-    setShuffleVariant(v);
-    setVariantState(v);
-  };
-
-  return (
-    <div className="photoStackLab">
-      <div className="photoStackLabTitle">Shuffle lab</div>
-      {SHUFFLE_VARIANTS.map((v) => (
-        <button
-          key={v.id}
-          type="button"
-          className={`photoStackLabOption${
-            v.id === variant ? " photoStackLabOptionActive" : ""
-          }`}
-          onClick={() => choose(v.id)}
-        >
-          {v.label}
-        </button>
-      ))}
     </div>
   );
 };

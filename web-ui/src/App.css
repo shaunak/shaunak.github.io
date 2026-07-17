@@ -432,7 +432,6 @@ a:hover {
 /* PhotoStack: a pile of "printouts" you shuffle through one at a time. */
 .photoStack {
   margin: 1.25rem auto 1.75rem;
-  max-width: 34rem;
 }
 
 .photoStackPile {
@@ -563,22 +562,20 @@ a:hover {
   }
 }
 
-/* ---- Shuffle lab: tuck-behind reconciliation variants (prototype). ----
-   Each variant handles the moment a card whose shape differs from the new
-   front photo merges with the pile. Timed against the 620ms flight:
-   "next" tucks behind at ~56%, "prev" emerges during the first ~42%. */
-
-/* A. Shrink to fit: the photo morphs to the incoming front photo's box.
-   object-fit: cover crops instead of stretching while dimensions change. */
+/* Shape reconciliation while a card tucks behind / emerges from the pile:
+   the in-flight photo morphs to the box of the photo taking the front slot.
+   object-fit: cover crops instead of stretching while dimensions change.
+   Timed against the 620ms flight: "next" tucks behind at ~56%, "prev"
+   emerges during the first ~42%. */
 .photoStackFly .photoStackImage {
   object-fit: cover;
 }
 
-.photoStackVariant-shrink.photoStackFlyNext .photoStackImage {
+.photoStackFlyNext .photoStackImage {
   animation: photoStackShrinkDims 280ms ease-in-out 330ms forwards;
 }
 
-.photoStackVariant-shrink.photoStackFlyPrev .photoStackImage {
+.photoStackFlyPrev .photoStackImage {
   animation: photoStackGrowDims 280ms ease-in-out forwards;
 }
 
@@ -614,164 +611,6 @@ a:hover {
 .photoStackTopPresqueeze .photoStackImage {
   object-fit: cover;
   animation: photoStackGrowDims 300ms ease-in-out 280ms forwards;
-}
-
-/* B. Fade away: the card dissolves as it slips under the pile (and fades in
-   while emerging from it). */
-.photoStackVariant-fade.photoStackFlyNext .photoStackFlyCard {
-  animation: photoStackFadeOut 620ms linear forwards;
-}
-
-.photoStackVariant-fade.photoStackFlyPrev .photoStackFlyCard {
-  animation: photoStackFadeIn 620ms linear forwards;
-}
-
-@keyframes photoStackFadeOut {
-  0%,
-  52% {
-    opacity: 1;
-  }
-  90%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes photoStackFadeIn {
-  0% {
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.25;
-  }
-  45%,
-  100% {
-    opacity: 1;
-  }
-}
-
-/* C. Scale recede: the whole card shrinks uniformly to the width of the card
-   it's hiding behind — no cropping, reads as receding into the pile. */
-.photoStackVariant-recede.photoStackFlyNext .photoStackFlyCard {
-  animation: photoStackScaleTuck 620ms ease-in-out forwards;
-}
-
-.photoStackVariant-recede.photoStackFlyPrev .photoStackFlyCard {
-  animation: photoStackScaleEmerge 620ms ease-in-out forwards;
-}
-
-@keyframes photoStackScaleTuck {
-  0%,
-  50% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(var(--tuckScale, 1));
-  }
-}
-
-@keyframes photoStackScaleEmerge {
-  0% {
-    transform: scale(var(--tuckScale, 1));
-  }
-  55%,
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* D. 3D tuck: the card tips backward and flattens into the pile, fading as
-   it goes; emerging cards rise up out of the pile the same way. */
-.photoStackVariant-flip {
-  perspective: 900px;
-}
-
-.photoStackVariant-flip.photoStackFlyNext .photoStackFlyCard {
-  transform-origin: 50% 90%;
-  animation: photoStackFlipUnder 620ms ease-in-out forwards;
-}
-
-.photoStackVariant-flip.photoStackFlyPrev .photoStackFlyCard {
-  transform-origin: 50% 90%;
-  animation: photoStackFlipOut 620ms ease-in-out forwards;
-}
-
-@keyframes photoStackFlipUnder {
-  0%,
-  54% {
-    transform: rotateX(0deg);
-    opacity: 1;
-  }
-  82% {
-    transform: rotateX(48deg);
-    opacity: 0.45;
-  }
-  96%,
-  100% {
-    transform: rotateX(66deg);
-    opacity: 0;
-  }
-}
-
-@keyframes photoStackFlipOut {
-  0% {
-    transform: rotateX(-55deg);
-    opacity: 0;
-  }
-  18% {
-    transform: rotateX(-30deg);
-    opacity: 0.7;
-  }
-  45%,
-  100% {
-    transform: rotateX(0deg);
-    opacity: 1;
-  }
-}
-
-/* Floating prototype switcher (remove with the lab). */
-.photoStackLab {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.6rem 0.7rem;
-  background: #fffdf8;
-  border: 1px solid rgba(0, 0, 0, 0.18);
-  border-radius: 0.6rem;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-}
-
-.photoStackLabTitle {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  opacity: 0.6;
-  margin-bottom: 0.15rem;
-}
-
-.photoStackLabOption {
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 0.5rem;
-  background: transparent;
-  padding: 0.3rem 0.6rem;
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.85rem;
-  text-align: left;
-}
-
-.photoStackLabOption:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.photoStackLabOptionActive {
-  background: #b5e5f6;
-  font-weight: 700;
 }
 
 /* The rest of the pile reacts a little when a card leaves or lands. */
