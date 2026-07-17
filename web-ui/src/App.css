@@ -465,20 +465,139 @@ a:hover {
 
 .photoStackCardTop {
   position: relative;
+  z-index: 2;
   transform: rotate(-0.4deg);
-  animation: photoStackSettle 240ms ease-out;
 }
 
-@keyframes photoStackSettle {
-  from {
-    transform: rotate(1.6deg) translate(0.5rem, -0.4rem) scale(1.015);
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
-  }
-  to {
+/* The card in flight during a shuffle. The outer div is the animated frame
+   (transform + z-index keyframes); the inner .photoStackCard is the printout. */
+.photoStackFly {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.photoStackFlyNext {
+  animation: photoStackFlyNext 620ms cubic-bezier(0.33, 0.09, 0.24, 1) forwards;
+}
+
+.photoStackFlyPrev {
+  animation: photoStackFlyPrev 620ms cubic-bezier(0.33, 0.09, 0.24, 1) forwards;
+}
+
+/* > : pick the top photo up, sweep it out right, tuck it under the pile. */
+@keyframes photoStackFlyNext {
+  0% {
     transform: rotate(-0.4deg);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+    z-index: 5;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.12));
+  }
+  16% {
+    transform: translate(4%, -7%) rotate(2deg) scale(1.05);
+    z-index: 5;
+    filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.22));
+  }
+  46% {
+    transform: translate(85%, 2%) rotate(10deg) scale(1.05);
+    z-index: 5;
+    filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.22));
+  }
+  56% {
+    transform: translate(85%, 5%) rotate(8deg) scale(1.02);
+    z-index: 0;
+    filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.16));
+  }
+  88% {
+    transform: translate(0.55rem, 0.55rem) rotate(2.8deg);
+    z-index: 0;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
+  }
+  100% {
+    transform: rotate(2deg) translate(0.4rem, 0.45rem);
+    z-index: 0;
+    filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0));
   }
 }
+
+/* < : slide the bottom photo out left from under the pile, lift it over,
+   drop it on top with a small settle wobble. */
+@keyframes photoStackFlyPrev {
+  0% {
+    transform: rotate(2deg) translate(0.4rem, 0.45rem);
+    z-index: 0;
+    filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0));
+  }
+  12% {
+    transform: rotate(0.5deg) translate(-8%, 0.4rem);
+    z-index: 0;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
+  }
+  42% {
+    transform: translate(-85%, 2%) rotate(-10deg) scale(1.02);
+    z-index: 0;
+    filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.16));
+  }
+  52% {
+    transform: translate(-85%, -4%) rotate(-8deg) scale(1.06);
+    z-index: 5;
+    filter: drop-shadow(0 16px 20px rgba(0, 0, 0, 0.24));
+  }
+  82% {
+    transform: translate(-2%, -6%) rotate(-2deg) scale(1.05);
+    z-index: 5;
+    filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.2));
+  }
+  92% {
+    transform: rotate(-1.5deg) scale(1);
+    z-index: 5;
+    filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.12));
+  }
+  100% {
+    transform: rotate(-0.4deg);
+    z-index: 5;
+    filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0));
+  }
+}
+
+/* The rest of the pile reacts a little when a card leaves or lands. */
+.photoStackPileShuffling .photoStackCardBehindOne {
+  animation: photoStackNudgeOne 620ms ease-in-out;
+}
+
+.photoStackPileShuffling .photoStackCardBehindTwo {
+  animation: photoStackNudgeTwo 620ms ease-in-out;
+}
+
+@keyframes photoStackNudgeOne {
+  0%,
+  50% {
+    transform: rotate(-2.4deg) translate(-0.35rem, 0.3rem);
+  }
+  72% {
+    transform: rotate(-3.1deg) translate(-0.45rem, 0.42rem);
+  }
+  100% {
+    transform: rotate(-2.4deg) translate(-0.35rem, 0.3rem);
+  }
+}
+
+@keyframes photoStackNudgeTwo {
+  0%,
+  55% {
+    transform: rotate(2deg) translate(0.4rem, 0.45rem);
+  }
+  78% {
+    transform: rotate(2.7deg) translate(0.52rem, 0.56rem);
+  }
+  100% {
+    transform: rotate(2deg) translate(0.4rem, 0.45rem);
+  }
+}
+
 
 .photoStackImage {
   display: block;

@@ -16,6 +16,12 @@ html, body, #root {
   width: 100%;
 }
 
+/* Keep animated elements that fly past the viewport edge (e.g. PhotoStack
+   shuffles) from creating a horizontal scrollbar. */
+html, body {
+  overflow-x: clip;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
