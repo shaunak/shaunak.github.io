@@ -321,10 +321,13 @@ function BlogPostPage() {
             </div>
           ) : (
             <>
-              {renderAuthPanel()}
-
               {loading ? <div>Loading…</div> : null}
               {error ? <div style={{ color: "#b00020" }}>{error}</div> : null}
+
+              {/* Only ask for a password once the fetch has come back empty —
+                  that's what a protected post looks like to a signed-out
+                  visitor. Public posts never see this panel. */}
+              {!loading && !error && !post ? renderAuthPanel() : null}
 
               {!loading && !error && !post && (session?.user || hasAttemptedUnlock) ? (
                 <div>Post not found.</div>
