@@ -1,0 +1,25 @@
+name: Keep Supabase awake
+
+# Free-tier Supabase projects pause after ~7 days without API activity.
+# A daily query through the REST API counts as activity and resets the clock.
+on:
+  schedule:
+    - cron: "23 14 * * *" # daily at 14:23 UTC (odd minute to dodge GH cron load spikes)
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query the posts table
+        # The anon key is public by design (it ships in the site's JS bundle);
+        # RLS is what protects the data.
+        env:
+          SUPABASE_URL: https://vbnpoblsackuihwncsur.supabase.co
+          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZibnBvYmxzYWNrdWlod25jc3VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5MTAxODksImV4cCI6MjA3OTQ4NjE4OX0.FQYNAVQ91qCPsxFtBiToVDv_ph201nFj4TcjTH5mTTA
+        run: |
+          set -euo pipefail
+          count=$(curl -sf "$SUPABASE_URL/rest/v1/posts?select=slug&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" | jq 'length')
+          echo "Supabase responded with $count row(s) — project is awake."
