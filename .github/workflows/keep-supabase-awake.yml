@@ -10,6 +10,8 @@ on:
 jobs:
   ping:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write # to re-enable this workflow (keepalive below)
     steps:
       - name: Query the posts table
         # The anon key is public by design (it ships in the site's JS bundle);
@@ -23,3 +25,14 @@ jobs:
             -H "apikey: $SUPABASE_ANON_KEY" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" | jq 'length')
           echo "Supabase responded with $count row(s) — project is awake."
+
+      - name: Keep this workflow alive
+        # GitHub disables scheduled workflows after 60 days of repo
+        # inactivity. Calling the "enable" endpoint on ourselves resets that
+        # timer, so the cron never gets switched off.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method PUT \
+            "repos/${{ github.repository }}/actions/workflows/keep-supabase-awake.yml/enable"
+          echo "Workflow disable-timer reset."
