@@ -16,7 +16,7 @@
     "remark-gfm": "^4.0.1"
   },
   "scripts": {
-    "predeploy": "npm run build",
+    "predeploy": "npm run build && node scripts/generate-previews.mjs",
     "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -42,12 +42,14 @@
     ]
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@types/jest": "^29.5.14",
     "@types/react": "^19.0.4",
     "@types/react-dom": "^19.2.3",
     "gh-pages": "^6.3.0",
+    "satori": "^0.28.2",
     "supabase": "^2.58.5",
     "web-vitals": "^4.2.4"
   }
