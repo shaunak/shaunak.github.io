@@ -124,6 +124,7 @@ const Blog = () => {
         const { data, error: fetchError } = await blogSupabase
           .from("posts")
           .select("title,subheading,tags,slug,is_protected,created_at")
+          .eq("is_archived", false)
           .order("created_at", { ascending: false });
 
         if (cancelled) return;

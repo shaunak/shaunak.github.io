@@ -96,6 +96,7 @@ function BlogPostPage() {
           .from("posts")
           .select("title,subheading,tags,created_at,slug,content,is_protected")
           .eq("slug", slug)
+          .eq("is_archived", false)
           .maybeSingle();
 
         if (cancelled) return;
