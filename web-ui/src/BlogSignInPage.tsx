@@ -71,7 +71,6 @@ function BlogSignInPage() {
   return (
     <div className="App">
       <main className="MainContent">
-        <h1 className="typewriter">Blog Sign In</h1>
 
         <div className="buttonContainer">
           <Link to="/blog" className="link socialLink">
